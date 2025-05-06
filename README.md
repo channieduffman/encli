@@ -18,7 +18,7 @@
 
     encli -e text.txt -o encrypted.enc
 
-This encrypts the file `text.txt` into the file `encrypted.enc`. The following are equivalent:
+This encrypts the file `text.txt` into the file `encrypted.enc`. 
 
 ---
 
