@@ -1,35 +1,34 @@
 package org.encli.cli;
 
-// local local packages
+import org.encli.exception.CryptoException;
+import org.encli.exception.UserConfigurationException;
+import org.encli.exception.UserFileSystemException;
 import org.encli.service.*;
 
-// java pacakages
 import java.nio.file.*;
 import java.util.List;
 import java.util.concurrent.*;
 import javax.crypto.SecretKey;
 
-// dotenv-java
 import io.github.cdimascio.dotenv.Dotenv;
 
-// picocli
 import picocli.CommandLine.*;
 import picocli.CommandLine.Model.CommandSpec;
 
 @Command(name = "encli")
 public class CLI implements Callable<Integer> {
     /* Constants */
-    private static final String PARAMETER_EXCEPTION = "Too many arguments: Only one input when '-o' specified.";
+    private static final String PARAMETER_EXCEPTION_MESSAGE = "Incompatible arguments: Cannot specify output file name for multiple inputs";
 
     /* picocli Annotations */
 
     @Spec
-    CommandSpec spec;
+    private CommandSpec spec;
 
     @ArgGroup(exclusive = true, multiplicity = "1")
-    Mode mode;
+    private Mode mode;
 
-    static class Mode {
+    private static class Mode {
         @Option(names = "-e", description = "encrypt mode")
         static boolean encrypt;
         @Option(names = "-d", description = "decrypt mode")
@@ -37,15 +36,20 @@ public class CLI implements Callable<Integer> {
     }
 
     @Option(names = "-o", description = "(optional) the output file path")
-    Path output;
+    private Path output;
+
+    @Option(names = "--env", required = true, description = "path to .env file")
+    private Path env;
 
     @Parameters(arity = "1..*", description = "a list of input file paths (to be encrypted/decrypted)")
-    List<Path> inputs;
+    private List<Path> inputs;
 
     @Override
-    public Integer call() throws ParameterException {
+    public Integer call()
+            throws ParameterException, CryptoException, UserConfigurationException, UserFileSystemException {
         try {
-            Dotenv dotenv = Dotenv.load();
+            Path parent = env.getParent();
+            Dotenv dotenv = Dotenv.configure().directory(parent.toString()).load();
 
             // Fetch key; create one if needed
             SecretKey key = KeyStoreService.getKey(Paths.get(dotenv.get("KEYSTORE_LOCATION")), dotenv.get("KEY_ALIAS"),
@@ -53,7 +57,7 @@ public class CLI implements Callable<Integer> {
 
             // Can only encrypt/decrypt one file at a time if '-o' specified
             if (output != null && inputs.size() > 1)
-                throw new ParameterException(spec.commandLine(), PARAMETER_EXCEPTION);
+                throw new ParameterException(spec.commandLine(), PARAMETER_EXCEPTION_MESSAGE);
 
             if (Mode.encrypt) {
                 for (Path input : inputs)
@@ -62,8 +66,12 @@ public class CLI implements Callable<Integer> {
                 for (Path input : inputs)
                     EncryptionService.decrypt(input, output, key);
             }
-        } catch (FileAlreadyExistsException e) {
-            System.err.println(e.getMessage());
+        } catch (CryptoException e) {
+            throw e;
+        } catch (UserConfigurationException e) {
+            throw e;
+        } catch (UserFileSystemException e) {
+            throw e;
         }
 
         return 0;

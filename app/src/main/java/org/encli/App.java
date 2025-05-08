@@ -4,17 +4,20 @@
 package org.encli;
 
 import picocli.CommandLine;
+import picocli.CommandLine.IExecutionExceptionHandler;
+import picocli.CommandLine.ParseResult;
 
 import org.encli.cli.*;
+import org.encli.exception.CryptoException;
+import org.encli.exception.ExceptionHandler;
+import org.encli.exception.UserConfigurationException;
+import org.encli.exception.UserFileSystemException;
 
 public class App {
 
     public static void main(String[] args) {
-        try {
-            int exitCode = new CommandLine(new CLI()).execute(args);
-            System.exit(exitCode);
-        } catch (Exception e) {
-            System.err.println(e.getMessage());
-        }
+        ExceptionHandler handler = new ExceptionHandler();
+        int exitCode = new CommandLine(new CLI()).setExecutionExceptionHandler(handler).execute(args);
+        System.exit(exitCode);
     }
 }

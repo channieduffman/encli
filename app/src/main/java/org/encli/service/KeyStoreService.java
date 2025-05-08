@@ -4,8 +4,13 @@ import java.io.*;
 import java.nio.file.*;
 import java.security.*;
 import java.security.KeyStore.*;
+import java.security.cert.CertificateException;
+
 import javax.crypto.*;
 
+import org.encli.exception.CryptoException;
+import org.encli.exception.UserConfigurationException;
+import org.encli.exception.UserFileSystemException;
 import org.encli.util.*;
 
 public class KeyStoreService {
@@ -19,20 +24,23 @@ public class KeyStoreService {
      * @param alias
      * @param password
      * @return SecretKey
+     * @throws CryptoException if fails to load key
      */
-    private static SecretKey loadKey(Path path, String alias, char[] password) {
+    private static SecretKey loadKey(Path path, String alias, char[] password) throws CryptoException {
         SecretKey sk = null;
-        KeyStore ks = null;
 
         try (InputStream is = Files.newInputStream(path)) {
-            ks = KeyStore.getInstance(TYPE);
+            KeyStore ks = KeyStore.getInstance(TYPE);
             ks.load(is, password);
             ProtectionParameter pp = new PasswordProtection(password);
             SecretKeyEntry skEntry = (SecretKeyEntry) ks.getEntry(alias, pp);
             sk = skEntry.getSecretKey();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (CertificateException | KeyStoreException | NoSuchAlgorithmException | IOException e) {
+            throw new CryptoException("Failed to access keystore", e);
+        } catch (UnrecoverableEntryException e) {
+            throw new CryptoException("Failed to retrieve secret key", e);
         }
+
         return sk;
     }
 
@@ -44,22 +52,25 @@ public class KeyStoreService {
      * @param alias
      * @param password
      * @return SecretKey
+     * @throws CryptoException if fails to load key
      */
     private static SecretKey loadNewKey(Path path, String alias, char[] password) {
         SecretKey sk = null;
-        KeyStore ks = null;
 
         try (OutputStream os = Files.newOutputStream(path)) {
-            ks = KeyStore.getInstance(TYPE);
+            KeyStore ks = KeyStore.getInstance(TYPE);
             ks.load(null, null);
-            sk = KeyUtil.getKey();
+            sk = KeyUtil.getKey(); // may throw CryptoException
             SecretKeyEntry skEntry = new SecretKeyEntry(sk);
             ProtectionParameter pp = new PasswordProtection(password);
             ks.setEntry(alias, skEntry, pp);
             ks.store(os, password);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (CertificateException | KeyStoreException | NoSuchAlgorithmException | IOException e) {
+            throw new CryptoException("Failed to access keystore", e);
+        } catch (CryptoException e) {
+            throw e;
         }
+
         return sk;
     }
 
@@ -69,20 +80,37 @@ public class KeyStoreService {
      * @param path
      * @param alias
      * @param password
-     * @return
+     * @return SecretKey object or null
+     * @throws CryptoException            if either loadKey() or loadNewKey() fails
+     * @throws UserConfigurationException if fails to load config
+     * @throws UserFileSystemException    if file access issues occur
      */
     public static SecretKey getKey(Path path, String alias, char[] password) {
+
+        if (path == null || alias == null || password == null) {
+            throw new UserConfigurationException("Failed to load user configuration");
+        }
+
         SecretKey sk = null;
+
         try {
+
+            Path parent = path.getParent();
+            if (!Files.exists(parent) && Files.notExists(parent))
+                Files.createDirectory(parent);
+
+            // java.io.File.createNewFile() returns true if a new file was created,
+            // i.e. if and only if it did not already exist
             boolean created = new File(path.toString()).createNewFile();
             if (created) {
                 sk = loadNewKey(path, alias, password);
             } else {
                 sk = loadKey(path, alias, password);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException e) {
+            throw new UserFileSystemException("Failed to access file " + path.toString(), e);
         }
+
         return sk;
     }
 

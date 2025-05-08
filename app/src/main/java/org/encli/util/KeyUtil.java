@@ -1,22 +1,21 @@
 package org.encli.util;
 
-import javax.crypto.*;
+import java.security.NoSuchAlgorithmException;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import org.encli.exception.CryptoException;
 
 public class KeyUtil {
     private static final String ALGORITHM = "AES";
     private static final int SIZE = 128;
 
-    public static SecretKey getKey() {
-        SecretKey sk = null;
-
+    public static SecretKey getKey() throws CryptoException {
         try {
             KeyGenerator kg = KeyGenerator.getInstance(ALGORITHM);
             kg.init(SIZE);
-            sk = kg.generateKey();
-        } catch (Exception e) {
-            e.printStackTrace();
+            return kg.generateKey();
+        } catch (NoSuchAlgorithmException e) {
+            throw new CryptoException("Failed to generate AES key", e);
         }
-
-        return sk;
     }
 }

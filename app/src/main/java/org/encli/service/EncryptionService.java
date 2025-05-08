@@ -1,5 +1,7 @@
 package org.encli.service;
 
+import org.encli.exception.CryptoException;
+import org.encli.exception.UserFileSystemException;
 import org.encli.util.*;
 
 import java.io.IOException;
@@ -23,21 +25,23 @@ public class EncryptionService {
      * @param src path to the input file
      * @param dst path to the output (encrypted) file
      * @param key secret key used to initialize cipher
-     * @throws FileAlreadyExistsException
+     * @throws
      */
-    public static void encrypt(Path src, Path dst, SecretKey key) throws FileAlreadyExistsException {
+    public static void encrypt(Path src, Path dst, SecretKey key) throws UserFileSystemException {
         // Retrieve output path from PathUtil
         PathUtil pu = new PathUtil(src, dst, PathUtil.ENCRYPT);
         Path out = pu.getPath();
 
-        // Avoid overwriting files;
-        // Per documentation, if Files.exists(path) and Files.notExists(path) both
-        // return false, the existence of the file could not be determined. Treat this
-        // as existing.
+        /*
+         * Avoid overwriting files;
+         * Per documentation, if Files.exists(path) and Files.notExists(path) both
+         * return false, the existence of the file could not be determined. Treat this
+         * as existing.
+         */
         if (Files.exists(out)) {
-            throw new FileAlreadyExistsException(String.format(EXISTS, out));
+            throw new UserFileSystemException(String.format(EXISTS, out));
         } else if (!Files.exists(out) && !Files.notExists(out)) {
-            throw new FileAlreadyExistsException(String.format(UNKNOWN, out));
+            throw new UserFileSystemException(String.format(UNKNOWN, out));
         }
 
         try (OutputStream os = Files.newOutputStream(out)) {
@@ -61,19 +65,11 @@ public class EncryptionService {
                 }
             }
         } catch (IOException e) {
-            // IO
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            // handle a key error
-            e.printStackTrace();
-        } catch (InvalidAlgorithmParameterException e) {
-            // handle an IV error
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
-            // handle cipher instance errors
-            e.printStackTrace();
+            throw new UserFileSystemException("Failed to process files", e);
+        } catch (InvalidKeyException | InvalidAlgorithmParameterException | NoSuchAlgorithmException
+                | NoSuchPaddingException e) {
+            throw new CryptoException("Failed to initialize cipher", e);
         }
-
     }
 
     /**
@@ -83,17 +79,16 @@ public class EncryptionService {
      * @param src path to the input file
      * @param dst path to the output (decrypted) file
      * @param key secret key used to initialize cipher
-     * @throws FileAlreadyExistsException
      */
-    public static void decrypt(Path src, Path dst, SecretKey key) throws FileAlreadyExistsException {
+    public static void decrypt(Path src, Path dst, SecretKey key) throws UserFileSystemException {
         PathUtil pu = new PathUtil(src, dst, PathUtil.DECRYPT);
         Path out = pu.getPath();
 
         // See `EncryptionService.encrypt(Path, Path, SecretKey)`
         if (Files.exists(out)) {
-            throw new FileAlreadyExistsException(String.format(EXISTS, out));
+            throw new UserFileSystemException(String.format(EXISTS, out));
         } else if (!Files.exists(out) && !Files.notExists(out)) {
-            throw new FileAlreadyExistsException(String.format(UNKNOWN, out));
+            throw new UserFileSystemException(String.format(UNKNOWN, out));
         }
 
         try (InputStream is = Files.newInputStream(src)) {
@@ -111,17 +106,12 @@ public class EncryptionService {
                 }
             }
         } catch (IOException e) {
-            // handle IO errors
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            // handle a key error
-            e.printStackTrace();
-        } catch (InvalidAlgorithmParameterException e) {
-            // handle an IV error
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
-            // handle cipher instance errors
-            e.printStackTrace();
+            throw new UserFileSystemException("Failed to process files", e);
+        } catch (InvalidKeyException | InvalidAlgorithmParameterException | NoSuchAlgorithmException
+                | NoSuchPaddingException e) {
+            throw new CryptoException("Failed to initialize cipher", e);
+        } catch (UserFileSystemException e) { // thrown by IVUtil(InputStream)
+            throw e;
         }
     }
 }

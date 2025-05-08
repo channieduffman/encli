@@ -8,6 +8,7 @@
 plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     id 'application'
+
 }
 
 repositories {
@@ -41,4 +42,30 @@ java {
 application {
     // Define the main class for the application.
     mainClass = 'org.encli.App'
+}
+
+// Added from picocli docs
+compileJava {
+    options.compilerArgs += ["-Aproject=${project.group}/${project.name}"]
+}
+
+application {
+    // Define the main class for the application.
+    mainClass = 'org.encli.App'
+}
+
+jar {
+    manifest {
+        attributes(
+            'Main-Class': 'org.encli.App'
+        )
+    }
+
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+tasks.named('jar') {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }

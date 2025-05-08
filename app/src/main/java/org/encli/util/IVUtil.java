@@ -6,6 +6,8 @@ import java.security.SecureRandom;
 
 import javax.crypto.spec.IvParameterSpec;
 
+import org.encli.exception.UserFileSystemException;
+
 public class IVUtil {
     /* Class Constants */
     private static final int IV_SIZE = 16;
@@ -32,7 +34,7 @@ public class IVUtil {
             if (bytesRead != IV_SIZE)
                 _iv = null;
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new UserFileSystemException("Failed to read IV from file " + is.toString(), e);
         }
         return _iv;
     }
