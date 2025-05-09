@@ -1,15 +1,23 @@
 package org.encli.service;
 
-import org.encli.exception.CryptoException;
-import org.encli.exception.UserFileSystemException;
-import org.encli.util.*;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.*;
-import java.security.*;
-import javax.crypto.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.security.InvalidKeyException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.NoSuchAlgorithmException;
+import javax.crypto.Cipher;
+import javax.crypto.CipherInputStream;
+import javax.crypto.CipherOutputStream;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+
+import org.encli.exception.CryptoException;
+import org.encli.exception.UserFileSystemException;
+import org.encli.util.IVUtil;
+import org.encli.util.PathUtil;
 
 public class EncryptionService {
     /* Class Constants */
@@ -109,7 +117,7 @@ public class EncryptionService {
                 }
             }
         } catch (IOException e) {
-            throw new UserFileSystemException("Failed to process files", e);
+            throw new UserFileSystemException("Failed to open, read, or write to files", e);
         } catch (InvalidKeyException | InvalidAlgorithmParameterException | NoSuchAlgorithmException
                 | NoSuchPaddingException e) {
             throw new CryptoException("Failed to initialize cipher", e);

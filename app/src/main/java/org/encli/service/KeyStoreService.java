@@ -1,17 +1,27 @@
 package org.encli.service;
 
-import java.io.*;
-import java.nio.file.*;
-import java.security.*;
-import java.security.KeyStore.*;
-import java.security.cert.CertificateException;
+import java.io.File;
+import java.io.InputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
-import javax.crypto.*;
+import java.security.cert.CertificateException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.KeyStore.PasswordProtection;
+import java.security.KeyStore.ProtectionParameter;
+import java.security.KeyStore.SecretKeyEntry;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableEntryException;
+
+import javax.crypto.SecretKey;
 
 import org.encli.exception.CryptoException;
 import org.encli.exception.UserConfigurationException;
 import org.encli.exception.UserFileSystemException;
-import org.encli.util.*;
+import org.encli.util.KeyUtil;
 
 public class KeyStoreService {
     private static final String TYPE = "PKCS12";

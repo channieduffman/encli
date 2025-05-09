@@ -3,7 +3,6 @@ package org.encli.util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.SecureRandom;
-
 import javax.crypto.spec.IvParameterSpec;
 
 import org.encli.exception.UserFileSystemException;

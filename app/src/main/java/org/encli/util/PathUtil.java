@@ -1,9 +1,9 @@
 package org.encli.util;
 
-import java.nio.file.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class PathUtil {
-
     private Path path;
 
     public static final String ENCRYPT = "ENCRYPT";

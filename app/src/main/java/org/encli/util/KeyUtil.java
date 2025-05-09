@@ -3,6 +3,7 @@ package org.encli.util;
 import java.security.NoSuchAlgorithmException;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+
 import org.encli.exception.CryptoException;
 
 public class KeyUtil {

@@ -1,19 +1,25 @@
 package org.encli.cli;
 
+import io.github.cdimascio.dotenv.Dotenv;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.concurrent.Callable;
+import javax.crypto.SecretKey;
+
 import org.encli.exception.CryptoException;
 import org.encli.exception.UserConfigurationException;
 import org.encli.exception.UserFileSystemException;
 import org.encli.service.*;
 
-import java.nio.file.*;
-import java.util.List;
-import java.util.concurrent.*;
-import javax.crypto.SecretKey;
-
-import io.github.cdimascio.dotenv.Dotenv;
-
-import picocli.CommandLine.*;
+import picocli.CommandLine.ArgGroup;
+import picocli.CommandLine.Command;
 import picocli.CommandLine.Model.CommandSpec;
+import picocli.CommandLine.Option;
+import picocli.CommandLine.Parameters;
+import picocli.CommandLine.ParameterException;
+import picocli.CommandLine.Spec;
 
 @Command(name = "encli")
 public class CLI implements Callable<Integer> {
@@ -63,11 +69,7 @@ public class CLI implements Callable<Integer> {
                 for (Path input : inputs)
                     EncryptionService.decrypt(input, output, key);
             }
-        } catch (CryptoException e) {
-            throw e;
-        } catch (UserConfigurationException e) {
-            throw e;
-        } catch (UserFileSystemException e) {
+        } catch (CryptoException | UserConfigurationException | UserFileSystemException e) {
             throw e;
         }
 

@@ -6,19 +6,25 @@ import picocli.CommandLine.IExecutionExceptionHandler;
 import picocli.CommandLine.ParameterException;
 
 public class ExceptionHandler implements IExecutionExceptionHandler {
+    private static final String ERR = "error: %s: %s";
+
+    private void printErrorMessage(String type, Exception e) {
+        System.err.println(String.format(ERR, type, e.getMessage()));
+    }
+
     @Override
     public int handleExecutionException(Exception e, CommandLine commandLine, ParseResult parseResult) {
         // TODO: logging
         if (e instanceof UserFileSystemException) {
-            System.err.println("FILESYSTEM ERROR: " + e.getMessage());
+            printErrorMessage("filesystem", e);
         } else if (e instanceof CryptoException) {
-            System.err.println("CRYPTOGRAPHIC ERROR: " + e.getMessage());
+            printErrorMessage("crypto", e);
         } else if (e instanceof UserConfigurationException) {
-            System.err.println("CONFIGURATION ERROR: " + e.getMessage());
+            printErrorMessage("config", e);
         } else if (e instanceof ParameterException) {
-            System.err.println("INVALID ARGUMENTS: " + e.getMessage());
+            printErrorMessage("args", e);
         } else { // the exception was unanticipated
-            System.err.println("UNEXPECTED ERROR: " + e.getMessage());
+            printErrorMessage("unknown", e);
         }
         return commandLine.getCommandSpec().exitCodeOnExecutionException();
     }
