@@ -6,10 +6,11 @@
 
 ## Usage
 
-    encli [-o=<output>] (-e | -d) <inputs>...
+    encli --env=<file> [-o=<output>] (-e | -d) <inputs>...
         <inputs>...     a list of input file paths (to be encrypted/decrypted)
         -d              decrypt mode
         -e              encrypt mode
+        --env=<file>    path to configuration (.env) file
         -o=<output>     the output file path (can only be used with a singular input)
 
 While picocli handles argument parsing, invoking the app in this way is achieved locally with a little script magic. For instance, `/usr/local/bin`:
