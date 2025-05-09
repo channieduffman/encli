@@ -8,15 +8,13 @@ import static org.junit.Assert.*;
 
 import javax.crypto.SecretKey;
 
-import org.encli.cli.*;
-import org.encli.service.*;
 import org.encli.util.*;;
 
 public class AppTest {
 
-    // @Test
-    // public void testKeyUtil() {
-    // SecretKey sk = KeyUtil.getKey();
-    // assertNotNull("A new secret key should not be null", sk);
-    // }
+    @Test
+    public void testKeyUtil() {
+        SecretKey sk = KeyUtil.getKey();
+        assertNotNull("A new secret key should not be null", sk);
+    }
 }

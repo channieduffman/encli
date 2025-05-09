@@ -4,14 +4,9 @@
 package org.encli;
 
 import picocli.CommandLine;
-import picocli.CommandLine.IExecutionExceptionHandler;
-import picocli.CommandLine.ParseResult;
 
 import org.encli.cli.*;
-import org.encli.exception.CryptoException;
 import org.encli.exception.ExceptionHandler;
-import org.encli.exception.UserConfigurationException;
-import org.encli.exception.UserFileSystemException;
 
 public class App {
 
