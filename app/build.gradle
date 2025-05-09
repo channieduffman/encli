@@ -24,8 +24,8 @@ dependencies {
     implementation libs.guava
 
     // picocli
-    implementation 'info.picocli:picocli:4.7.6'
-    annotationProcessor 'info.picocli:picocli-codegen:4.7.6'
+    implementation 'info.picocli:picocli:4.7.7'
+    annotationProcessor 'info.picocli:picocli-codegen:4.7.7'
 
     
     // dotenv-java
@@ -49,23 +49,21 @@ compileJava {
     options.compilerArgs += ["-Aproject=${project.group}/${project.name}"]
 }
 
-application {
-    // Define the main class for the application.
-    mainClass = 'org.encli.App'
-}
 
 jar {
     manifest {
         attributes(
-            'Main-Class': 'org.encli.App'
+            'Main-Class': application.mainClass
         )
     }
 
+    // Without this, I get a NoClassDefFoundError from picocli/CommandLine
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
 }
 
+// A duplicates strategy must be set
 tasks.named('jar') {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }

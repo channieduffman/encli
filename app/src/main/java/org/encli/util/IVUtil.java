@@ -7,6 +7,7 @@ import java.security.SecureRandom;
 import javax.crypto.spec.IvParameterSpec;
 
 import org.encli.exception.UserFileSystemException;
+import org.encli.exception.CryptoException;
 
 public class IVUtil {
     /* Class Constants */
@@ -26,15 +27,16 @@ public class IVUtil {
      * @param is InputStream object from which to extract the IV
      * @return a byte array or null
      * @throws UserFileSystemException
+     * @throws CryptoException
      */
     private byte[] extractIV(InputStream is) {
         byte[] _iv = new byte[IV_SIZE];
         try {
             int bytesRead = is.read(_iv);
             if (bytesRead != IV_SIZE)
-                _iv = null;
+                throw new CryptoException("Failed to extract IV");
         } catch (IOException e) {
-            throw new UserFileSystemException("Failed to read IV from file " + is.toString(), e);
+            throw new UserFileSystemException("Error getting IV from file " + is.toString(), e);
         }
         return _iv;
     }
