@@ -9,7 +9,7 @@ public class KeyUtil {
     private static final String ALGORITHM = "AES";
     private static final int SIZE = 128;
 
-    public static SecretKey getKey() throws CryptoException {
+    public static SecretKey getKey() {
         try {
             KeyGenerator kg = KeyGenerator.getInstance(ALGORITHM);
             kg.init(SIZE);

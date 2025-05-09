@@ -26,7 +26,7 @@ public class KeyStoreService {
      * @return SecretKey
      * @throws CryptoException if fails to load key
      */
-    private static SecretKey loadKey(Path path, String alias, char[] password) throws CryptoException {
+    private static SecretKey loadKey(Path path, String alias, char[] password) {
         SecretKey sk = null;
 
         try (InputStream is = Files.newInputStream(path)) {
@@ -108,7 +108,7 @@ public class KeyStoreService {
                 sk = loadKey(path, alias, password);
             }
         } catch (IOException e) {
-            throw new UserFileSystemException("Failed to access file " + path.toString(), e);
+            throw new UserFileSystemException("Unable to access file " + path.toString(), e);
         }
 
         return sk;

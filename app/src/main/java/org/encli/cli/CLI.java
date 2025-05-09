@@ -17,9 +17,6 @@ import picocli.CommandLine.Model.CommandSpec;
 
 @Command(name = "encli")
 public class CLI implements Callable<Integer> {
-    /* Constants */
-    private static final String PARAMETER_EXCEPTION_MESSAGE = "Incompatible arguments: Cannot specify output file name for multiple inputs";
-
     /* picocli Annotations */
 
     @Spec
@@ -57,7 +54,7 @@ public class CLI implements Callable<Integer> {
 
             // Can only encrypt/decrypt one file at a time if '-o' specified
             if (output != null && inputs.size() > 1)
-                throw new ParameterException(spec.commandLine(), PARAMETER_EXCEPTION_MESSAGE);
+                throw new ParameterException(spec.commandLine(), "Cannot specify output file name for multiple inputs");
 
             if (Mode.encrypt) {
                 for (Path input : inputs)

@@ -3,6 +3,7 @@ package org.encli.exception;
 import picocli.CommandLine;
 import picocli.CommandLine.ParseResult;
 import picocli.CommandLine.IExecutionExceptionHandler;
+import picocli.CommandLine.ParameterException;
 
 public class ExceptionHandler implements IExecutionExceptionHandler {
     @Override
@@ -13,6 +14,8 @@ public class ExceptionHandler implements IExecutionExceptionHandler {
             System.err.println("CRYPTOGRAPHIC ERROR: " + e.getMessage());
         } else if (e instanceof UserConfigurationException) {
             System.err.println("CONFIGURATION ERROR: " + e.getMessage());
+        } else if (e instanceof ParameterException) {
+            System.err.println("INVALID ARGUMENTS: " + e.getMessage());
         } else { // the exception was unanticipated
             System.err.println("UNEXPECTED ERROR: " + e.getMessage());
         }

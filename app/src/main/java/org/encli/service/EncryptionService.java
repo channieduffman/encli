@@ -25,9 +25,10 @@ public class EncryptionService {
      * @param src path to the input file
      * @param dst path to the output (encrypted) file
      * @param key secret key used to initialize cipher
-     * @throws
+     * @throws CryptoException
+     * @throws UserFileSystemException
      */
-    public static void encrypt(Path src, Path dst, SecretKey key) throws UserFileSystemException {
+    public static void encrypt(Path src, Path dst, SecretKey key) {
         // Retrieve output path from PathUtil
         PathUtil pu = new PathUtil(src, dst, PathUtil.ENCRYPT);
         Path out = pu.getPath();
@@ -65,7 +66,7 @@ public class EncryptionService {
                 }
             }
         } catch (IOException e) {
-            throw new UserFileSystemException("Failed to process files", e);
+            throw new UserFileSystemException("Failed to open, read, or write to files", e);
         } catch (InvalidKeyException | InvalidAlgorithmParameterException | NoSuchAlgorithmException
                 | NoSuchPaddingException e) {
             throw new CryptoException("Failed to initialize cipher", e);
@@ -79,8 +80,10 @@ public class EncryptionService {
      * @param src path to the input file
      * @param dst path to the output (decrypted) file
      * @param key secret key used to initialize cipher
+     * @throws CryptoException
+     * @throws UserFileSystemException
      */
-    public static void decrypt(Path src, Path dst, SecretKey key) throws UserFileSystemException {
+    public static void decrypt(Path src, Path dst, SecretKey key) {
         PathUtil pu = new PathUtil(src, dst, PathUtil.DECRYPT);
         Path out = pu.getPath();
 

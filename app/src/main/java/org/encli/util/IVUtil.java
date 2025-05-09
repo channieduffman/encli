@@ -25,7 +25,7 @@ public class IVUtil {
      * 
      * @param is InputStream object from which to extract the IV
      * @return a byte array or null
-     * @throws Exception
+     * @throws UserFileSystemException
      */
     private byte[] extractIV(InputStream is) {
         byte[] _iv = new byte[IV_SIZE];
