@@ -1,6 +1,6 @@
 # encli
 
-**encli** is a command-line file encryption tool that implements AES encryption. I wrote it to get practice with Java, explore the [picocli](https://picocli.info) library, and introduce myself to cryptography. It is a work in progress.
+**encli** is a command-line file encryption tool that implements AES encryption. I wrote it to practice with Java, explore the [picocli](https://picocli.info) library, and introduce myself to cryptography.
 
 ---
 
@@ -11,6 +11,11 @@
         -d              decrypt mode
         -e              encrypt mode
         -o=<output>     the output file path (can only be used with a singular input)
+
+While picocli handles argument parsing, invoking the app in this way is achieved locally with a little script magic. For instance, `/usr/local/bin`:
+
+    #!/bin/bash
+    java -jar /path/to/executable/app.jar --env=/path/to/config/.env "$@"
 
 ---
 
@@ -34,3 +39,8 @@ This will decrypt the file `encrypted.enc` and name it with an appended extensio
 
 ---
 
+    find . -type f -name "*.java" | xargs -I{} encli -e "{}"
+
+This recursively encrypts all Java source files in or below the current directory.
+
+---

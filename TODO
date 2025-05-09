@@ -1,2 +1,2 @@
-- [x] A file (like ramiro.enc) is created even if the app fails; don't do that
-- [ ] Exceptions are not well-handled right now
+- [ ] A file (like ramiro.enc) is created even if the app fails; don't do that
+- [x] Exceptions are not well-handled right now
